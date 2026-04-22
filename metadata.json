@@ -1,0 +1,6 @@
+{
+  "name": "WordsMaster - 智能单词背诵专家",
+  "description": "一款支持Excel导入、三阶段科学记忆、联动多词典的专业英语单词背诵工具。",
+  "requestFramePermissions": ["camera"],
+  "majorCapabilities": []
+}
