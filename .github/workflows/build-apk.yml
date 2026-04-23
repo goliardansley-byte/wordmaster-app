@@ -32,15 +32,17 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
+      - name: Grant execute permission for gradlew
+        working-directory: ./android
+        run: chmod +x ./gradlew
+
       - name: Clean Android project
         working-directory: ./android
         run: ./gradlew clean
 
       - name: Build APK
         working-directory: ./android
-        run: |
-          chmod +x ./gradlew
-          ./gradlew assembleDebug
+        run: ./gradlew assembleDebug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
