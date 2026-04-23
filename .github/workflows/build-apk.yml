@@ -32,6 +32,17 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
+      - name: Force Java 17 compatibility in Gradle
+        working-directory: ./android
+        run: |
+          # 在 gradle.properties 中设置 Java 工具链版本
+          echo "org.gradle.java.home=${JAVA_HOME_17_X64}" >> gradle.properties
+          echo "org.gradle.jvmargs=-Xmx2048m -Dfile.encoding=UTF-8" >> gradle.properties
+          # 修改所有模块的 build.gradle 中的 Java 版本（如果存在）
+          find . -name "build.gradle" -type f -exec sed -i 's/JavaVersion.VERSION_21/JavaVersion.VERSION_17/g' {} \;
+          find . -name "build.gradle" -type f -exec sed -i 's/sourceCompatibility = 21/sourceCompatibility = 17/g' {} \;
+          find . -name "build.gradle" -type f -exec sed -i 's/targetCompatibility = 21/targetCompatibility = 17/g' {} \;
+
       - name: Grant execute permission for gradlew
         working-directory: ./android
         run: chmod +x ./gradlew
