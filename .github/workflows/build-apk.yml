@@ -35,30 +35,29 @@ jobs:
       - name: Force Java 17 in Capacitor libraries
         working-directory: ./android
         run: |
-          echo "JAVA_HOME=${JAVA_HOME_17_X64}" >> $GITHUB_ENV
           echo "org.gradle.java.home=${JAVA_HOME_17_X64}" >> gradle.properties
           echo "org.gradle.jvmargs=-Xmx2048m" >> gradle.properties
           
-          # 直接修改 capacitor-android 模块的 build.gradle
+          # 修改 capacitor-android 的 build.gradle
           if [ -f capacitor-android/build.gradle ]; then
             sed -i 's/JavaVersion.VERSION_21/JavaVersion.VERSION_17/g' capacitor-android/build.gradle
             sed -i 's/sourceCompatibility = 21/sourceCompatibility = 17/g' capacitor-android/build.gradle
             sed -i 's/targetCompatibility = 21/targetCompatibility = 17/g' capacitor-android/build.gradle
           fi
           
-          # 同样处理 capacitor-cordova-android-plugins
+          # 修改 capacitor-cordova-android-plugins 的 build.gradle
           if [ -f capacitor-cordova-android-plugins/build.gradle ]; then
             sed -i 's/JavaVersion.VERSION_21/JavaVersion.VERSION_17/g' capacitor-cordova-android-plugins/build.gradle
             sed -i 's/sourceCompatibility = 21/sourceCompatibility = 17/g' capacitor-cordova-android-plugins/build.gradle
             sed -i 's/targetCompatibility = 21/targetCompatibility = 17/g' capacitor-cordova-android-plugins/build.gradle
           fi
           
-          # 最后兜底：强制所有子模块使用 Java 17 工具链
-          echo "allprojects {" >> build.gradle
-          echo "    tasks.withType(JavaCompile) {" >> build.gradle
-          echo "        options.release = 17" >> build.gradle
-          echo "    }" >> build.gradle
-          echo "}" >> build.gradle
+          # 确保 app/build.gradle 中也使用 Java 17
+          if [ -f app/build.gradle ]; then
+            sed -i 's/JavaVersion.VERSION_21/JavaVersion.VERSION_17/g' app/build.gradle
+            sed -i 's/sourceCompatibility = 21/sourceCompatibility = 17/g' app/build.gradle
+            sed -i 's/targetCompatibility = 21/targetCompatibility = 17/g' app/build.gradle
+          fi
 
       - name: Grant execute permission for gradlew
         working-directory: ./android
