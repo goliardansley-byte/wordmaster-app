@@ -32,16 +32,33 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Force Java 17 compatibility in Gradle
+      - name: Force Java 17 in Capacitor libraries
         working-directory: ./android
         run: |
-          # 在 gradle.properties 中设置 Java 工具链版本
+          echo "JAVA_HOME=${JAVA_HOME_17_X64}" >> $GITHUB_ENV
           echo "org.gradle.java.home=${JAVA_HOME_17_X64}" >> gradle.properties
-          echo "org.gradle.jvmargs=-Xmx2048m -Dfile.encoding=UTF-8" >> gradle.properties
-          # 修改所有模块的 build.gradle 中的 Java 版本（如果存在）
-          find . -name "build.gradle" -type f -exec sed -i 's/JavaVersion.VERSION_21/JavaVersion.VERSION_17/g' {} \;
-          find . -name "build.gradle" -type f -exec sed -i 's/sourceCompatibility = 21/sourceCompatibility = 17/g' {} \;
-          find . -name "build.gradle" -type f -exec sed -i 's/targetCompatibility = 21/targetCompatibility = 17/g' {} \;
+          echo "org.gradle.jvmargs=-Xmx2048m" >> gradle.properties
+          
+          # 直接修改 capacitor-android 模块的 build.gradle
+          if [ -f capacitor-android/build.gradle ]; then
+            sed -i 's/JavaVersion.VERSION_21/JavaVersion.VERSION_17/g' capacitor-android/build.gradle
+            sed -i 's/sourceCompatibility = 21/sourceCompatibility = 17/g' capacitor-android/build.gradle
+            sed -i 's/targetCompatibility = 21/targetCompatibility = 17/g' capacitor-android/build.gradle
+          fi
+          
+          # 同样处理 capacitor-cordova-android-plugins
+          if [ -f capacitor-cordova-android-plugins/build.gradle ]; then
+            sed -i 's/JavaVersion.VERSION_21/JavaVersion.VERSION_17/g' capacitor-cordova-android-plugins/build.gradle
+            sed -i 's/sourceCompatibility = 21/sourceCompatibility = 17/g' capacitor-cordova-android-plugins/build.gradle
+            sed -i 's/targetCompatibility = 21/targetCompatibility = 17/g' capacitor-cordova-android-plugins/build.gradle
+          fi
+          
+          # 最后兜底：强制所有子模块使用 Java 17 工具链
+          echo "allprojects {" >> build.gradle
+          echo "    tasks.withType(JavaCompile) {" >> build.gradle
+          echo "        options.release = 17" >> build.gradle
+          echo "    }" >> build.gradle
+          echo "}" >> build.gradle
 
       - name: Grant execute permission for gradlew
         working-directory: ./android
