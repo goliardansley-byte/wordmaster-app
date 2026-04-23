@@ -30,42 +30,11 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: '17'
-
-      - name: Force Java 17 in Capacitor libraries
-        working-directory: ./android
-        run: |
-          echo "org.gradle.java.home=${JAVA_HOME_17_X64}" >> gradle.properties
-          echo "org.gradle.jvmargs=-Xmx2048m" >> gradle.properties
-          
-          # 修改 capacitor-android 的 build.gradle
-          if [ -f capacitor-android/build.gradle ]; then
-            sed -i 's/JavaVersion.VERSION_21/JavaVersion.VERSION_17/g' capacitor-android/build.gradle
-            sed -i 's/sourceCompatibility = 21/sourceCompatibility = 17/g' capacitor-android/build.gradle
-            sed -i 's/targetCompatibility = 21/targetCompatibility = 17/g' capacitor-android/build.gradle
-          fi
-          
-          # 修改 capacitor-cordova-android-plugins 的 build.gradle
-          if [ -f capacitor-cordova-android-plugins/build.gradle ]; then
-            sed -i 's/JavaVersion.VERSION_21/JavaVersion.VERSION_17/g' capacitor-cordova-android-plugins/build.gradle
-            sed -i 's/sourceCompatibility = 21/sourceCompatibility = 17/g' capacitor-cordova-android-plugins/build.gradle
-            sed -i 's/targetCompatibility = 21/targetCompatibility = 17/g' capacitor-cordova-android-plugins/build.gradle
-          fi
-          
-          # 确保 app/build.gradle 中也使用 Java 17
-          if [ -f app/build.gradle ]; then
-            sed -i 's/JavaVersion.VERSION_21/JavaVersion.VERSION_17/g' app/build.gradle
-            sed -i 's/sourceCompatibility = 21/sourceCompatibility = 17/g' app/build.gradle
-            sed -i 's/targetCompatibility = 21/targetCompatibility = 17/g' app/build.gradle
-          fi
+          java-version: '21'
 
       - name: Grant execute permission for gradlew
         working-directory: ./android
         run: chmod +x ./gradlew
-
-      - name: Clean Android project
-        working-directory: ./android
-        run: ./gradlew clean
 
       - name: Build APK
         working-directory: ./android
